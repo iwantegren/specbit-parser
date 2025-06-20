@@ -1,15 +1,12 @@
-const BYTE = 8;
+import { BitStream } from "./bit-stream";
+import { BYTE } from "./utils";
 
-export class InputBitStream {
-  private bitOffset: number = 0;
-  private byteOffset: number = 0;
-
-  constructor(private readonly buffer: Uint8Array) {
-    if (!this.buffer) {
+export class InputBitStream extends BitStream {
+  constructor(buffer: Uint8Array) {
+    if (!buffer) {
       throw new Error("Buffer not provided");
     }
-
-    console.log("buffer: ", this.buffer);
+    super(buffer);
   }
 
   public readBit(): boolean {
@@ -24,7 +21,7 @@ export class InputBitStream {
     return !!bit;
   }
 
-  private readByte(): number {
+  protected readByte(): number {
     if (this.bitOffset !== 0) {
       throw new Error("Can read only whole byte");
     }
@@ -36,7 +33,7 @@ export class InputBitStream {
     return byte;
   }
 
-  public readBits(bits: number): BigInt {
+  public readBits(bits: number): bigint {
     let result = 0n;
     let count = bits;
 
@@ -45,10 +42,10 @@ export class InputBitStream {
       --count;
     }
 
-    while (count >= 8) {
+    while (count >= BYTE) {
       const b = this.readByte();
       result = (result << 8n) | BigInt(b);
-      count -= 8;
+      count -= BYTE;
     }
 
     while (count > 0) {
@@ -75,26 +72,5 @@ export class InputBitStream {
 
   public remaining(): number {
     return this.buffer.length * BYTE - this.tell();
-  }
-
-  public eof(): boolean {
-    return this.bitOffset + this.byteOffset * BYTE >= this.buffer.length * BYTE;
-  }
-
-  private checkEof(): void {
-    if (this.eof()) throw new Error("No more bits left");
-  }
-
-  private moveBit(): void {
-    ++this.bitOffset;
-
-    if (this.bitOffset === 8) {
-      this.bitOffset = 0;
-      this.moveByte();
-    }
-  }
-
-  private moveByte(): void {
-    ++this.byteOffset;
   }
 }

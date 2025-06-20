@@ -1,14 +1,38 @@
+import { ProtocolField } from "./types.js";
 import { InputBitStream } from "./utils/input-stream.js";
+import { configBitLength } from "./utils/utils.js";
 
-export function decode(buffer: Uint8Array): object {
+export function decode(
+  buffer: Uint8Array,
+  config: ProtocolField[],
+  strictLength: boolean = true // allow buffer length differs from configs
+): Record<string, bigint> {
   const stream = new InputBitStream(buffer);
 
-  let result = {};
+  if (strictLength) {
+    const streamLength = stream.remaining();
+    const configLength = configBitLength(config);
+    if (streamLength !== configLength) {
+      throw new Error(
+        `Buffer length (${streamLength}) doesn't match expected protocol length (${configLength})`
+      );
+    }
+  }
 
-  result = { key4bit: stream.readBits(4), ...result };
-  result = { key1bit: stream.readBits(1), ...result };
-  result = { key3bit: stream.readBits(3), ...result };
-  result = { key8bit: stream.readBits(8), ...result };
+  const result: Record<string, bigint> = {};
 
-  return result;
+  try {
+    for (const field of config) {
+      if (field.rsvd) {
+        stream.skipBits(field.length);
+        continue;
+      }
+
+      result[field.name] = stream.readBits(field.length);
+    }
+  } catch (e) {
+    console.warn(e);
+  } finally {
+    return result;
+  }
 }

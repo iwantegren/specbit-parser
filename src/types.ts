@@ -1,19 +1,14 @@
-export type InputBuffer = Uint8Array;
-
-export enum ProtocolFieldType {
-  INTEGER = "integer",
-  FLOAT = "float",
-  STRING = "string",
-  BOOLEAN = "boolean",
-}
-
-export type ProtocolFieldConfig = {
+export type ProtocolField = {
   name: string;
-  type?: ProtocolFieldType;
   length: number;
   rsvd?: boolean;
 };
 
-export type ProtocolConfig = {
-  fields: ProtocolFieldConfig[];
+export type ProtocolSpec = ProtocolField[];
+export type ProtocolSpecOutput = Record<string, bigint>;
+
+export type ProtocolValue = ProtocolField & {
+  value: bigint;
 };
+
+export type ProtocolPayload = ProtocolValue[];
