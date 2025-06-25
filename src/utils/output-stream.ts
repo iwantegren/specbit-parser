@@ -9,7 +9,7 @@ export class OutputBitStream extends BitStream {
     super(new Uint8Array(capacity));
   }
 
-  public writeBit(bit: boolean): void {
+  protected writeBit(bit: boolean): void {
     this.checkEof();
 
     if (bit) {
@@ -30,6 +30,13 @@ export class OutputBitStream extends BitStream {
     this.moveByte();
   }
 
+  /**
+   * Writes a specified number of bits from a bigint value to the stream.
+   * The bits are written from most significant to least significant.
+   * @param value The bigint value to write bits from. Must be non-negative.
+   * @param count The number of bits to write from the value.
+   * @throws {Error} If value is negative or if there is not enough space in the buffer.
+   */
   public writeBits(value: bigint, count: number): void {
     if (value < 0n) {
       throw new Error("Cannot write negative bigint");
@@ -58,6 +65,10 @@ export class OutputBitStream extends BitStream {
     }
   }
 
+  /**
+   * Returns the underlying buffer containing all written data.
+   * @returns A Uint8Array containing the written data.
+   */
   public getBuffer(): Uint8Array {
     return this.buffer;
   }

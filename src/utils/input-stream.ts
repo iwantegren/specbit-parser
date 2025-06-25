@@ -9,7 +9,7 @@ export class InputBitStream extends BitStream {
     super(buffer);
   }
 
-  public readBit(): boolean {
+  protected readBit(): boolean {
     this.checkEof();
 
     const bit = (this.buffer[this.byteOffset] >> (7 - this.bitOffset)) & 1;
@@ -30,6 +30,17 @@ export class InputBitStream extends BitStream {
     return byte;
   }
 
+  protected tell(): number {
+    return this.bitOffset + this.byteOffset * BYTE;
+  }
+
+  /**
+   * Reads a specified number of bits from the stream and returns them as a bigint.
+   * The bits are read from most significant to least significant.
+   * @param bits The number of bits to read from the stream.
+   * @returns A bigint containing the read bits.
+   * @throws {Error} If there are not enough bits remaining in the buffer.
+   */
   public readBits(bits: number): bigint {
     let result = 0n;
     let count = bits;
@@ -53,19 +64,19 @@ export class InputBitStream extends BitStream {
     return result;
   }
 
+  /**
+   * Skips a specified number of bits in the stream.
+   * @param length The number of bits to skip.
+   * @throws {Error} If there are not enough bits remaining in the buffer.
+   */
   public skipBits(length: number): void {
     this.readBits(length);
   }
 
-  public seekToStart(position: number): void {
-    this.bitOffset = 0;
-    this.byteOffset = 0;
-  }
-
-  public tell(): number {
-    return this.bitOffset + this.byteOffset * BYTE;
-  }
-
+  /**
+   * Returns the number of bits remaining in the stream.
+   * @returns The number of unread bits in the buffer.
+   */
   public remaining(): number {
     return this.buffer.length * BYTE - this.tell();
   }

@@ -57,9 +57,7 @@ describe("decodeRecord", () => {
       result = decodeRecord(brokenBuffer, brokenConfig, {
         strictLength: false,
       });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
 
     expect(result).toBeUndefined();
   });
