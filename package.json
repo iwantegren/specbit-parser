@@ -1,19 +1,25 @@
 {
-  "name": "protocol-parser",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "specbit-parser",
+  "version": "0.1.0",
+  "description": "Bit stream encode/decode utilities for dynamic protocol parsing",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iwantegren/protocol-parser.git"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run build",
-    "smoke-test": "pnpm run build && node test.js",
+    "smoke-test": "pnpm run build && node test.js", 
     "test": "jest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["encode","decode","protocol","bitstream","spec"],
+  "author": "Ivan Bilan <iwantegren@gmail.com>",
+  "license": "MIT",  
   "packageManager": "pnpm@10.12.1",
   "devDependencies": {
     "@types/jest": "^30.0.0",

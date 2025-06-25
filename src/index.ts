@@ -7,3 +7,5 @@ export {
   type PacketRecord,
 } from "./types.js";
 export { payloadToRecord, recordToPayload } from "./utils/utils.js";
+export { Decoder } from "./decoder.js";
+export { Encoder } from "./encoder.js";
