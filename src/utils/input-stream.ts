@@ -16,8 +16,6 @@ export class InputBitStream extends BitStream {
 
     this.moveBit();
 
-    if (this.eof()) console.debug(`EOF`);
-
     return !!bit;
   }
 
@@ -29,7 +27,6 @@ export class InputBitStream extends BitStream {
     const byte = this.buffer[this.byteOffset];
     this.moveByte();
 
-    console.debug(`byte ${this.eof() ? "EOF" : ""}`);
     return byte;
   }
 
@@ -50,10 +47,9 @@ export class InputBitStream extends BitStream {
 
     while (count > 0) {
       result = (result << 1n) | (this.readBit() ? 1n : 0n);
-      count--;
+      --count;
     }
 
-    console.debug(`readBits ${bits}`);
     return result;
   }
 

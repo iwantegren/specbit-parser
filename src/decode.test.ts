@@ -1,8 +1,8 @@
-import { decode } from "../src/decode";
-import type { ProtocolField } from "../src/types";
+import { decodeRecord } from "../src/decode";
+import type { FieldSpec, PacketRecord } from "../src/types";
 
-describe("decode", () => {
-  const config: ProtocolField[] = [
+describe("decodeRecord", () => {
+  const config: FieldSpec[] = [
     { name: "first", length: 4 },
     { name: "second", length: 4 },
     { name: "third", length: 8 },
@@ -10,7 +10,7 @@ describe("decode", () => {
 
   it("decodes properly with matching buffer length", () => {
     const buffer = new Uint8Array([0b10100001, 0b11110000]);
-    const result = decode(buffer, config);
+    const result = decodeRecord(buffer, config);
 
     expect(result).toEqual({
       first: 0b1010n,
@@ -20,7 +20,7 @@ describe("decode", () => {
   });
 
   it("skips reserved fields", () => {
-    const reservedConfig: ProtocolField[] = [
+    const reservedConfig: FieldSpec[] = [
       { name: "a", length: 4 },
       { name: "rsvd", rsvd: true, length: 4 },
       { name: "b", length: 1 },
@@ -28,7 +28,7 @@ describe("decode", () => {
     ];
 
     const buffer = new Uint8Array([0b11001111, 0b11110000]);
-    const result = decode(buffer, reservedConfig);
+    const result = decodeRecord(buffer, reservedConfig);
 
     expect(result).toEqual({
       a: 0b1100n,
@@ -39,41 +39,33 @@ describe("decode", () => {
 
   it("throws error if buffer length mismatches and strictLength=true", () => {
     const shortBuffer = new Uint8Array([0b10100000]);
-    expect(() => decode(shortBuffer, config, true)).toThrow(
-      /Buffer length .* doesn't match expected protocol length/
-    );
+    expect(() =>
+      decodeRecord(shortBuffer, config, {
+        strictLength: true,
+      })
+    ).toThrow(/Buffer length .* doesn't match expected protocol length/);
   });
 
-  it("allows length mismatch when strictLength=false", () => {
-    const shortBuffer = new Uint8Array([0b10100001, 0b11110000]); // Provide full but test logic anyway
-    const partialConfig: ProtocolField[] = [
-      { name: "first", length: 4 },
-      { name: "second", length: 4 },
-      { name: "third", length: 16 },
-    ];
-    const result = decode(shortBuffer, partialConfig, false);
-
-    expect(result.first).toBe(0b1010n);
-    expect(result.second).toBe(0b0001n);
-
-    expect(typeof result.third === "bigint" || result.third === undefined).toBe(
-      true
-    );
-  });
-
-  it("handles invalid buffer gracefully inside try/catch", () => {
+  it("doesn't create a decoder instance if buffer is too short", () => {
     const brokenBuffer = new Uint8Array([0b11110000]); // Too short
-    const brokenConfig: ProtocolField[] = [
+    const brokenConfig: FieldSpec[] = [
       { name: "x", length: 16 }, // exceeds buffer
     ];
 
-    const result = decode(brokenBuffer, brokenConfig, false);
-    expect(typeof result).toBe("object");
-    expect(result.x === undefined || typeof result.x === "bigint").toBe(true);
+    let result: PacketRecord | undefined;
+    try {
+      result = decodeRecord(brokenBuffer, brokenConfig, {
+        strictLength: false,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    expect(result).toBeUndefined();
   });
 
   it("ignores extra bits in buffer when strictLength is false", () => {
-    const config: ProtocolField[] = [
+    const config: FieldSpec[] = [
       { name: "first", length: 4 },
       { name: "second", length: 4 },
       { name: "third", length: 8 },
@@ -87,7 +79,9 @@ describe("decode", () => {
       0b11001100, // extra (ignored)
     ]);
 
-    const result = decode(buffer, config, false);
+    const result = decodeRecord(buffer, config, {
+      strictLength: false,
+    });
 
     expect(result).toEqual({
       first: 0b1010n,

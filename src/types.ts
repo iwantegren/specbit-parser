@@ -1,14 +1,29 @@
-export type ProtocolField = {
+export type FieldSpec = {
   name: string;
   length: number;
   rsvd?: boolean;
 };
 
-export type ProtocolSpec = ProtocolField[];
-export type ProtocolSpecOutput = Record<string, bigint>;
-
-export type ProtocolValue = ProtocolField & {
+export type FieldPayload = FieldSpec & {
   value: bigint;
 };
 
-export type ProtocolPayload = ProtocolValue[];
+export type PacketSpec = FieldSpec[];
+export type PacketPayload = FieldPayload[];
+export type PacketRecord = Record<string, bigint>;
+
+export type DecoderConfig = {
+  strictLength: boolean;
+};
+
+export const defaultDecoderConfig: DecoderConfig = {
+  strictLength: true,
+};
+
+export type EncoderConfig = {
+  byteAligned: boolean;
+};
+
+export const defaultEncoderConfig: EncoderConfig = {
+  byteAligned: true,
+};
