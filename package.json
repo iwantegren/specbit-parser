@@ -8,7 +8,7 @@
   "files": ["dist"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iwantegren/protocol-parser.git"
+    "url": "git+https://github.com/iwantegren/specbit-parser.git"
   },
   "scripts": {
     "build": "tsc",
