@@ -1,6 +1,6 @@
 {
   "name": "specbit-parser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bit stream encode/decode utilities for dynamic protocol parsing",
   "type": "module",
   "main": "dist/index.js",

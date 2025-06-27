@@ -1,4 +1,9 @@
-import { PacketPayload, PacketRecord, PacketSpec } from "../types";
+import {
+  defaultDecoderConfig,
+  PacketPayload,
+  PacketRecord,
+  PacketSpec,
+} from "../types";
 
 export const BYTE = 8;
 
@@ -16,8 +21,12 @@ export function specByteLength(specs: PacketSpec): number {
   return Math.ceil(bitLength / BYTE);
 }
 
-export function payloadToRecord(payload: PacketPayload): PacketRecord {
+export function payloadToRecord(
+  payload: PacketPayload,
+  opts: { skipRsvd: boolean } = { skipRsvd: defaultDecoderConfig.skipRsvd }
+): PacketRecord {
   return payload.reduce((acc, field) => {
+    if (opts.skipRsvd && field.rsvd) return acc;
     acc[field.name] = field.value;
     return acc;
   }, {} as PacketRecord);

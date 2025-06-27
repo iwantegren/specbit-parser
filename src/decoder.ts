@@ -54,7 +54,7 @@ export class Decoder {
     return new Decoder(buffer, specs, config);
   }
 
-  public decodePayload(): PacketPayload {
+  public getPayload(): PacketPayload {
     if (this._payload) return this._payload;
 
     const stream = new InputBitStream(this.buffer);
@@ -63,6 +63,7 @@ export class Decoder {
     for (const spec of this.specs) {
       if (spec.rsvd) {
         stream.skipBits(spec.length);
+        result.push({ ...spec, value: 0n });
         continue;
       }
 
@@ -74,7 +75,7 @@ export class Decoder {
     return result;
   }
 
-  public decodeRecord(): PacketRecord {
-    return payloadToRecord(this.decodePayload());
+  public getRecord(): PacketRecord {
+    return payloadToRecord(this.getPayload(), this.opts);
   }
 }

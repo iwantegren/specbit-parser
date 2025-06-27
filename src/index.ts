@@ -1,5 +1,5 @@
 export { encode } from "./encode.js";
-export { decode, decodeRecord } from "./decode.js";
+export { decode } from "./decode.js";
 export {
   type FieldSpec,
   type PacketSpec,

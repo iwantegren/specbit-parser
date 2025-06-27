@@ -1,18 +1,15 @@
 import { Decoder } from "./decoder.js";
-import { DecoderConfig, FieldSpec, PacketPayload } from "./types.js";
-
-export function decodeRecord(
-  buffer: Uint8Array,
-  config: FieldSpec[],
-  opts: Partial<DecoderConfig> = {}
-): Record<string, bigint> {
-  return Decoder.create(buffer, config, opts).decodeRecord();
-}
+import {
+  DecoderConfig,
+  PacketPayload,
+  PacketRecord,
+  PacketSpec,
+} from "./types.js";
 
 export function decode(
   buffer: Uint8Array,
-  config: FieldSpec[],
+  config: PacketSpec,
   opts: Partial<DecoderConfig> = {}
 ): PacketPayload {
-  return Decoder.create(buffer, config, opts).decodePayload();
+  return Decoder.create(buffer, config, opts).getPayload();
 }

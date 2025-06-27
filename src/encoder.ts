@@ -23,7 +23,7 @@ export class Encoder {
     return new Encoder(payload, config);
   }
 
-  public encodeBuffer(): Uint8Array {
+  public getBuffer(): Uint8Array {
     if (this._buffer) return this._buffer;
 
     const bitLen = specBitLength(this.payload);
@@ -39,9 +39,10 @@ export class Encoder {
     for (const field of this.payload) {
       if (field.rsvd) {
         obs.writeBits(0n, field.length);
-      } else {
-        obs.writeBits(field.value, field.length);
+        continue;
       }
+
+      obs.writeBits(field.value, field.length);
     }
 
     if (!this.opts.byteAligned) {

@@ -21,7 +21,7 @@ describe("stream", () => {
       const payload: PacketPayload = [
         { name: "header", length: 8, value: 0xaan },
         { name: "flags", length: 3, value: 7n },
-        { name: "reserved", length: 5, value: 0n, rsvd: true },
+        { name: "rsvd", length: 5, value: 0n, rsvd: true },
         { name: "data1", length: 16, value: 0x1234n },
         { name: "data2", length: 16, value: 0x5678n },
         { name: "checksum", length: 8, value: 0xffn },
@@ -30,7 +30,7 @@ describe("stream", () => {
       const encodedBuffer = encode(payload);
       const decodedPayload = decode(encodedBuffer, payload as PacketSpec);
 
-      expect(decodedPayload).toEqual(payload.filter((f) => !f.rsvd));
+      expect(decodedPayload).toEqual(payload);
     });
 
     it("should encode and decode large payload with nested structure", () => {

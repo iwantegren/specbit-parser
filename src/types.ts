@@ -14,10 +14,12 @@ export type PacketRecord = Record<string, bigint>;
 
 export type DecoderConfig = {
   strictLength: boolean;
+  skipRsvd: boolean;
 };
 
 export const defaultDecoderConfig: DecoderConfig = {
   strictLength: true,
+  skipRsvd: true,
 };
 
 export type EncoderConfig = {

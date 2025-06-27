@@ -1,5 +1,6 @@
-import { decodeRecord } from "../src/decode";
+import { decode } from "../src/decode";
 import type { FieldSpec, PacketRecord } from "../src/types";
+import { payloadToRecord } from "./utils/utils";
 
 describe("decodeRecord", () => {
   const config: FieldSpec[] = [
@@ -10,7 +11,7 @@ describe("decodeRecord", () => {
 
   it("decodes properly with matching buffer length", () => {
     const buffer = new Uint8Array([0b10100001, 0b11110000]);
-    const result = decodeRecord(buffer, config);
+    const result = payloadToRecord(decode(buffer, config));
 
     expect(result).toEqual({
       first: 0b1010n,
@@ -28,7 +29,7 @@ describe("decodeRecord", () => {
     ];
 
     const buffer = new Uint8Array([0b11001111, 0b11110000]);
-    const result = decodeRecord(buffer, reservedConfig);
+    const result = payloadToRecord(decode(buffer, reservedConfig));
 
     expect(result).toEqual({
       a: 0b1100n,
@@ -40,7 +41,7 @@ describe("decodeRecord", () => {
   it("throws error if buffer length mismatches and strictLength=true", () => {
     const shortBuffer = new Uint8Array([0b10100000]);
     expect(() =>
-      decodeRecord(shortBuffer, config, {
+      decode(shortBuffer, config, {
         strictLength: true,
       })
     ).toThrow(/Buffer length .* doesn't match expected protocol length/);
@@ -54,9 +55,11 @@ describe("decodeRecord", () => {
 
     let result: PacketRecord | undefined;
     try {
-      result = decodeRecord(brokenBuffer, brokenConfig, {
-        strictLength: false,
-      });
+      result = payloadToRecord(
+        decode(brokenBuffer, brokenConfig, {
+          strictLength: false,
+        })
+      );
     } catch (e) {}
 
     expect(result).toBeUndefined();
@@ -77,9 +80,11 @@ describe("decodeRecord", () => {
       0b11001100, // extra (ignored)
     ]);
 
-    const result = decodeRecord(buffer, config, {
-      strictLength: false,
-    });
+    const result = payloadToRecord(
+      decode(buffer, config, {
+        strictLength: false,
+      })
+    );
 
     expect(result).toEqual({
       first: 0b1010n,
